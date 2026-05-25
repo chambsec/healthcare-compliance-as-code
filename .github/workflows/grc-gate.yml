@@ -66,9 +66,9 @@ jobs:
           {
             echo "["
             FIRST=1
-            for ns in compliance.sc28_aws compliance.ac3_aws compliance.cm6_aws compliance.cm6 ; do
+            for ns in compliance.hipaa.cmk_encryption compliance.hipaa.tls_enforce compliance.hipaa.versioning compliance.hipaa.lambda_vpc compliance.hipaa.iam_least_privilege ; do
               [[ $FIRST -eq 1 ]] && FIRST=0 || printf ","
-              conftest test --policy policies --namespace "$ns" --output=json plan.json || true
+              conftest test --policy ../../policies --namespace "$ns" --output=json plan.json || true
             done
             echo "]"
           } > ../../evidence/conftest-results.json
