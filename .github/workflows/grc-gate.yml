@@ -12,7 +12,7 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  TF_WORKING_DIR: terraform
+  TF_WORKING_DIR: terraform/grc-baseline
 
 jobs:
   grc-gate:
@@ -50,8 +50,15 @@ jobs:
       - name: Terraform plan
         working-directory: ${{ env.TF_WORKING_DIR }}
         env:
-          TF_VAR_project_name: cgep-lab
-          TF_VAR_environment: dev
+          TF_VAR_aws_region: us-east-1
+          TF_VAR_aws_profile: default
+          TF_VAR_starter_uploads_bucket_id: placeholder
+          TF_VAR_starter_uploads_bucket_arn: placeholder
+          TF_VAR_starter_dynamodb_table_arn: placeholder
+          TF_VAR_starter_lambda_role_id: placeholder
+          TF_VAR_starter_lambda_function_name: placeholder
+          TF_VAR_starter_private_subnet_ids: '["placeholder"]'
+          TF_VAR_starter_vpc_id: placeholder
         run: |
           terraform init -input=false
           terraform validate
@@ -62,19 +69,19 @@ jobs:
         id: conftest
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
-          mkdir -p ../evidence
+          mkdir -p ../../evidence
           {
             echo "["
             FIRST=1
             for ns in compliance.hipaa.cmk_encryption compliance.hipaa.tls_enforce compliance.hipaa.versioning compliance.hipaa.lambda_vpc compliance.hipaa.iam_least_privilege ; do
               [[ $FIRST -eq 1 ]] && FIRST=0 || printf ","
-              conftest test --policy ../policies --namespace "$ns" --output=json plan.json || true
+              conftest test --policy ../../policies --namespace "$ns" --output=json plan.json || true
             done
             echo "]"
-          } > ../evidence/conftest-results.json
+          } > ../../evidence/conftest-results.json
           python3 -c '
           import json, sys
-          d = json.load(open("../evidence/conftest-results.json"))
+          d = json.load(open("../../evidence/conftest-results.json"))
           fails = sum(len(r.get("failures") or []) for results in d for r in results)
           print(f"conftest failures: {fails}")
           sys.exit(0 if fails == 0 else 1)
@@ -85,10 +92,10 @@ jobs:
         if: always()
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
-          tfsec . --format sarif --out ../evidence/tfsec.sarif || true
+          tfsec . --format sarif --out ../../evidence/tfsec.sarif || true
           python3 -c '
           import json, sys
-          d = json.load(open("../evidence/tfsec.sarif"))
+          d = json.load(open("../../evidence/tfsec.sarif"))
           high = sum(
               1 for run in d.get("runs", [])
               for r in run.get("results", [])
