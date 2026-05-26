@@ -12,7 +12,7 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  TF_WORKING_DIR: terraform
+  TF_WORKING_DIR: terraform/grc-baseline
 
 jobs:
   grc-gate:
@@ -50,8 +50,15 @@ jobs:
       - name: Terraform plan
         working-directory: ${{ env.TF_WORKING_DIR }}
         env:
-          TF_VAR_project_name: cgep-lab
-          TF_VAR_environment: dev
+          TF_VAR_aws_region: us-east-1
+          TF_VAR_aws_profile: default
+          TF_VAR_starter_uploads_bucket_id: placeholder
+          TF_VAR_starter_uploads_bucket_arn: placeholder
+          TF_VAR_starter_dynamodb_table_arn: placeholder
+          TF_VAR_starter_lambda_role_id: placeholder
+          TF_VAR_starter_lambda_function_name: placeholder
+          TF_VAR_starter_private_subnet_ids: '["placeholder"]'
+          TF_VAR_starter_vpc_id: placeholder
         run: |
           terraform init -input=false
           terraform validate
