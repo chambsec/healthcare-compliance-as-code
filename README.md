@@ -2,7 +2,7 @@
 
 **Candidate:** Chris Chambers
 **Framework:** HIPAA Security Rule (Primary)
-**Submission repo:** github.com/chambsec/cgep-app-starter
+**Submission repo:** github.com/chambsec/healthcare-compliance-as-code
 
 > Fork of GRCEngClub/cgep-app-starter — Patient Intake API wrapped with four CGE-P GRC layers.
 
